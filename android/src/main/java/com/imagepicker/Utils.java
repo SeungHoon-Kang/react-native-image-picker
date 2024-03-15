@@ -401,28 +401,31 @@ public class Utils {
     //     return fileUris;
     // }
 
-    static List<Uri> collectUrisFromData(Intent data) {
-        List<Uri> fileUris = new ArrayList<>();
+    static List<WritableMap> collectUrisWithOrderFromData(Intent data, Context context) {
+        List<WritableMap> uriOrderList = new ArrayList<>();
         
-        // Check if there is no ClipData. This scenario typically applies when the user selects only one item.
         if (data.getClipData() == null) {
             Uri uri = data.getData();
             if (uri != null) {
-                fileUris.add(uri);
+                WritableMap map = Arguments.createMap();
+                map.putString("uri", uri.toString());
+                map.putInt("order", 0);  // Only one item selected, so order is 0
+                uriOrderList.add(map);
             }
         } else {
-            // When ClipData is not null, meaning multiple items were selected.
             ClipData clipData = data.getClipData();
-
-            // Iterate over the ClipData to preserve the order of selection.
             for (int i = 0; i < clipData.getItemCount(); ++i) {
                 Uri uri = clipData.getItemAt(i).getUri();
-                fileUris.add(uri);
+                WritableMap map = Arguments.createMap();
+                map.putString("uri", uri.toString());
+                map.putInt("order", i);  // The order is the index in ClipData
+                uriOrderList.add(map);
             }
         }
 
-        return fileUris;
+        return uriOrderList;
     }
+
 
 
 
