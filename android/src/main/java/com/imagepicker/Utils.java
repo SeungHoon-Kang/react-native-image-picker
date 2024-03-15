@@ -403,18 +403,18 @@ public class Utils {
 
     static List<Uri> collectUrisFromData(Intent data) {
         List<Uri> fileUris = new ArrayList<>();
-    
-        // Default Gallery app on older Android versions doesn't support multiple image
-        // picking and thus never uses clip data.
+        
+        // Check if there is no ClipData. This scenario typically applies when the user selects only one item.
         if (data.getClipData() == null) {
             Uri uri = data.getData();
             if (uri != null) {
                 fileUris.add(uri);
-                return fileUris;
             }
         } else {
+            // When ClipData is not null, meaning multiple items were selected.
             ClipData clipData = data.getClipData();
 
+            // Iterate over the ClipData to preserve the order of selection.
             for (int i = 0; i < clipData.getItemCount(); ++i) {
                 Uri uri = clipData.getItemAt(i).getUri();
                 fileUris.add(uri);
@@ -423,6 +423,7 @@ public class Utils {
 
         return fileUris;
     }
+
 
 
     static ReadableMap getImageResponseMap(Uri uri, Options options, Context context) {
